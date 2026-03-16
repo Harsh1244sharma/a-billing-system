@@ -1,0 +1,191 @@
+
+
+<style>
+  .form-box {
+  width: 95%;
+  max-width: 800px;   /* बड़े screen पर limit */
+  margin: auto;
+  padding: 20px;
+  background-color: rgba(0,128,0,0.1);
+  border-radius: 8px;
+}
+
+.form-row {
+  display: block;   /* default: mobile पर block layout */
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-row input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* बड़े screen पर inline layout */
+@media (min-width: 768px) {
+  .form-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .form-row {
+    flex: 0 0 45%;   /* हर field 48% width लेगा */
+  }
+
+  .btn-box {
+    flex: 0 0 100%;  /* button full width row में */
+    text-align: center;
+    margin-top: 15px;
+  }
+}
+
+.btn-box button {
+  background-color: lightgreen;
+  height: 40px;
+  width: 100%;
+  max-width: 250px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+  *{
+    margin: 0;
+    padding: 0;
+  }
+    table,tr,td,th{
+        padding: 10px;
+    }
+    td,th{
+        border: 2px solid black;
+        border-collapse: collapse;
+    }
+    tr{
+        border: none;
+    }
+    @media (max-width: 600px) {
+  button {
+    width: 100%;
+    font-size: 18px;
+  }
+}
+.alfa{
+  text-align: center; margin-top: 20px;
+
+}
+.alfa button{
+  height: 40px;
+  width: 100%;
+  max-width: 300px;
+}
+
+</style>
+<div style="width: 100%; height: auto; display: flex;
+ flex-direction: column; justify-content: center; 
+ align-items: center; justify-content: space-around;">
+  <div style="width: 30%; height: 50px;  display: flex;
+   justify-content: center;align-items: center;">
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert" style="background-color: rgb(71, 201, 71); color: white; width: 80%; height: 30px;
+     text-align: center; font-size: 18px;" >
+      <span style="margin-top: 20px; font-size: 20px;">{{ message }} </span>
+    </div>
+  {% endfor %}
+{% endif %}
+</div>
+
+
+<div style="width: 90%; height: 60px;  display: flex; justify-content: center; 
+align-items: center;">
+<h2 style="text-align: center;"> <span style="color: blue;"> Bill No: </span>{{ bill.formatted_bill_no }} | <span style="color: red;"> Customer: </span>{{ bill.customer_name }} | <span  style="color: blueviolet;"> customer phn no - </span> {{ bill.phn }}</h2></div>
+<div style="width: 90%;  height: auto;  border: 2px solid black; box-shadow: 1px 1px 1px 1px black; display: flex;
+  flex-direction: column;">
+  
+<form method="post">
+  {% csrf_token %}
+  <div class="form-box">
+    <div class="form-row">
+      <label>Product Name:</label>
+      <input type="text" name="name" required> 
+    </div>
+
+    <div class="form-row">
+      <label>Quantity:</label>
+      <input type="number" name="quantity" required>
+    </div>
+
+    <div class="form-row">
+      <label>Price:</label>
+      <input type="number" step="0.01" name="price" required>
+    </div>
+
+    <div class="form-row">
+      <label>Exp:</label> 
+      <input type="text" name="exp" required>
+    </div>
+
+    <div class="btn-box">
+      <button type="submit">Add Product +</button>
+    </div>
+  </div>
+</form>
+
+
+
+<h1 style="text-align: center;">Products</h1>
+<table style="border: 1px solid gray; border-collapse: collapse;">
+    <tr>
+        <th>Name</th><th>Quantity</th><th>Price</th> <th>exp.</th> <th>Total</th> <th>action</th> <th>action</th>
+    </tr>
+    {% for p in products %}
+    <tr>
+        <td>{{ p.name }}</td>
+        <td>{{ p.quantity }}</td>
+        <td>{{ p.price }}</td>
+        <td>{{ p.exp }}</td>
+        <td>{{ p.total }}</td>
+        <td> <!-- Edit button --> 
+            <a href="{% url 'product_edit' bill.bill_no p.id %}">
+                 <button style="width: 90%; height: 30px; border-radius: 5px; background-color: blue; color: white;"
+                  type="button">Edit</button> </a></td>
+        <td> 
+            <form action="{% url 'product_delete' bill.bill_no p.id %}" method="post" class="delete-form">
+                 {% csrf_token %} <button style="width: 90%; height: 30px; border-radius: 5px; background-color: red; color: white;"
+                  type="submit">Delete</button>
+                 </form> </td>
+    </tr>
+    {% endfor %}
+</table>
+<h3 style="margin-top: 20px; margin-left: 10px;">Total Amount: {{ total_amount }}</h3>
+</div>
+<!-- Save & Print Buttons -->
+<a href="{% url 'bill_detail' bill.bill_no %}">
+    <button style="display: flex;
+ align-self: center; justify-self: center; 
+ margin-top: 20px; width: 100%; height: 40px; 
+ border-radius: 10px; align-items: center; justify-content: center;
+  background-color: blue; color: white;" type="button">Save & View Bill</button>
+</a>
+</div>
+</div>
+<script>
+  setTimeout(function() {
+    document.querySelectorAll('.alert').forEach(function(alert) {
+      alert.style.display = 'none';
+    });
+  }, 2000); // 5 seconds
+</script>
+</body>
+</html>
+
